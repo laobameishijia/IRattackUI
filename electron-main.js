@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
-const path = require('path')
-
+const { readdirSync, statSync, readFile} = require('fs');
+const { join, path } = require('path');
 let mainWindow
 
 function createWindow() {
@@ -52,5 +52,41 @@ ipcMain.handle('select-file', async () => {
     // 如果有选择，则返回路径，否则返回空
     return result.canceled ? null : result.filePaths[0]
   })
-  
-  
+
+  // 监听来自渲染进程的获取文件列表请求
+ipcMain.handle('get-files-in-directory', (event, directoryPath) => {
+  const getAllFiles = (dirPath) => {
+      let files = [];
+      const entries = readdirSync(dirPath, { withFileTypes: true });
+      entries.forEach(entry => {
+          const filePath = join(dirPath, entry.name);
+          if (entry.isDirectory()) {
+              files = files.concat(getAllFiles(filePath));
+          } else {
+              files.push(filePath);
+          }
+      });
+      return files;
+  };
+
+  try {
+      console.log(directoryPath)
+      return getAllFiles(directoryPath);
+  } catch (error) {
+      console.error('获取文件列表时出错:', error);
+      return [];
+  }
+});
+
+ipcMain.handle('read-text-file', (event, filePath) => {
+  return new Promise((resolve, reject) => {
+      readFile(filePath, 'utf8', (err, data) => {
+          if (err) {
+              console.error('读取文件时出错:', err);
+              reject(err);
+          } else {
+              resolve(data);
+          }
+      });
+  });
+});

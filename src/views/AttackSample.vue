@@ -9,7 +9,24 @@ const samples = ref();
 onMounted(() => {
     SampleService.getSamples(taskId).then((data) => (samples.value = data));
     console.log(samples)
+    readFileList()
+    readFile()
 });
+
+const readFileList = async () => {
+  const { ipcRenderer } = require('electron')
+  const directoryPath = "F:\\研三上\\毕业论文\\图表"; //Bogus.txt
+  const filePath = await ipcRenderer.invoke('get-files-in-directory',directoryPath )
+  console.log(filePath)
+}
+
+const readFile = async () => {
+  const { ipcRenderer } = require('electron')
+  const filePath = "F:\\研三上\\毕业论文\\图表\\Bogus.txt"; //
+  const data = await ipcRenderer.invoke('read-text-file',filePath )
+  console.log(data)
+}
+
 
 </script>
 
