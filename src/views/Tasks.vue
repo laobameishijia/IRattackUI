@@ -34,6 +34,13 @@ const viewAttackSample = (taskId) => {
             <Column header="创建时间" field="timestamp" style="width: 15%"></Column>
             <Column header="编译选项设定" field="compileflags" style="width: 10%"></Column>
             <Column header="攻击模型" field="targetmodel" style="width: 20%"></Column>
+            <Column header="进度" field="schedule" style="width: 10%">
+                <template #body="{ data }">
+                    <Button :severity="data.schedule === '100' ? 'success' : 'info'">
+                        {{ data.schedule === '100' ? '已完成' : '进行中' }}
+                    </Button>
+                </template>    
+            </Column>
 
             <!-- 查看攻击过程 -->
             <Column header="查看攻击过程" class="w-24 !text-end" style="width: 5%">
