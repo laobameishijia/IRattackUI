@@ -1,5 +1,5 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
-const { readdirSync, statSync, readFile} = require('fs');
+const { readdirSync, statSync, readFile } = require('fs');
 const { join, path } = require('path');
 let mainWindow
 
@@ -37,75 +37,89 @@ app.on('activate', function () {
 
 // 监听渲染进程的目录选择请求
 ipcMain.handle('select-directory', async () => {
-    const result = await dialog.showOpenDialog(mainWindow, {
-      properties: ['openDirectory']
-    })
-    // 如果有选择，则返回路径，否则返回空
-    return result.canceled ? null : result.filePaths[0]
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory']
   })
+  // 如果有选择，则返回路径，否则返回空
+  return result.canceled ? null : result.filePaths[0]
+})
 
 // 监听渲染进程的目录选择请求
 ipcMain.handle('select-file', async () => {
-    const result = await dialog.showOpenDialog(mainWindow, {
-      properties: ['openFile']
-    })
-    // 如果有选择，则返回路径，否则返回空
-    return result.canceled ? null : result.filePaths[0]
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile']
   })
+  // 如果有选择，则返回路径，否则返回空
+  return result.canceled ? null : result.filePaths[0]
+})
 
-  // 监听来自渲染进程的获取文件列表请求
+// 监听来自渲染进程的获取文件列表请求
+
 ipcMain.handle('get-files-in-directory', (event, directoryPath) => {
   const getAllFiles = (dirPath) => {
-      let files = [];
-      const entries = readdirSync(dirPath, { withFileTypes: true });
-      entries.forEach(entry => {
-          const filePath = join(dirPath, entry.name);
-          if (entry.isDirectory()) {
-              files = files.concat(getAllFiles(filePath));
-          } else {
-              files.push(filePath);
-          }
-      });
-      return files;
+    let files = [];
+    const entries = readdirSync(dirPath, { withFileTypes: true });
+    entries.forEach(entry => {
+      const filePath = join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        files = files.concat(getAllFiles(filePath));
+      } else if (filePath.endsWith('.txt')) { // 只处理 .txt 文件
+        const stats = statSync(filePath);
+        const fileName = entry.name;
+        const [iteration, confidence] = fileName.split('_').map((part, index) => {
+          return index === 0 ? parseInt(part, 10) : parseFloat(part.replace('.txt', ''));
+        });
+        files.push({
+          id: files.length + 1,
+          path: filePath,
+          timestamp: stats.birthtime,
+          iteration,
+          advconfidence,
+          targetmodel: basename(directoryPath)
+        });
+      }
+    });
+    return files;
   };
 
   try {
-      console.log(directoryPath)
-      return getAllFiles(directoryPath);
+    console.log(directoryPath);
+    return getAllFiles(directoryPath);
   } catch (error) {
-      console.error('获取文件列表时出错:', error);
-      return [];
+    console.error('获取文件列表时出错:', error);
+    return [];
   }
 });
 
+
 ipcMain.handle('read-text-file', (event, filePath) => {
   return new Promise((resolve, reject) => {
-      readFile(filePath, 'utf8', (err, data) => {
-          if (err) {
-              console.error('读取文件时出错:', err);
-              reject(err);
-          } else {
-              resolve(data);
-          }
-      });
+    readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('读取文件时出错:', err);
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
   });
 });
 
 ipcMain.handle('read-ui-json-file', (event, filePath) => {
   return new Promise((resolve, reject) => {
-      readFile(filePath, 'utf8', (err, data) => {
-          if (err) {
-              console.error('读取文件时出错:', err);
-              reject(err);
-          } else {
-              try {
-                  const jsonData = JSON.parse(data);
-                  resolve(jsonData);
-              } catch (parseError) {
-                  console.error('解析 JSON 时出错:', parseError);
-                  reject(parseError);
-              }
-          }
-      });
+    readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('读取文件时出错:', err);
+        reject(err);
+      } else {
+        try {
+          const jsonData = JSON.parse(data);
+          resolve(jsonData);
+        } catch (parseError) {
+          console.error('解析 JSON 时出错:', parseError);
+          reject(parseError);
+        }
+      }
+    });
   });
 });
