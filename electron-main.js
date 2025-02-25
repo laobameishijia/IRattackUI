@@ -15,9 +15,9 @@ function createWindow() {
 
   // 开发环境加载 Vue 项目地址，生产环境加载打包后的文件
   if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('http://localhost:5174')
+    mainWindow.loadURL('http://localhost:5173')
   } else {
-    mainWindow.loadURL('http://localhost:5174')
+    mainWindow.loadURL('http://localhost:5173')
     // mainWindow.loadFile(path.join(__dirname, 'index.html'))
   }
 

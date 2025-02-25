@@ -4,7 +4,7 @@
   "private": true,
   "main": "electron-main.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=development F:\\研三下\\UI\\IRFuzzUi\\node_modules\\electron\\dist\\electron.exe F:\\研三下\\UI\\IRFuzzUi",
+    "start": "cross-env NODE_ENV=development electron /home/lebron/IRattckUI/IRattackUI",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
