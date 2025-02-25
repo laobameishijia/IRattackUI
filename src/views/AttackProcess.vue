@@ -1,38 +1,141 @@
 <script setup>
 import { useRoute } from 'vue-router';
+import { useLayout } from '@/layout/composables/layout';
+import { onMounted, ref, watch } from 'vue';
+import { useStore } from 'vuex';
+const store = useStore();
 
 const route = useRoute();
 const taskId = route.params.id;  // 获取任务 ID
+
+const lineData = ref('');
+const lineOptions = ref('');
+
+const documentStyle = getComputedStyle(document.documentElement);
+const textColor = documentStyle.getPropertyValue('--text-color');
+const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+
+const value = ref(0);
+
+lineData.value = {
+    labels: '',
+    // data[0].targetmodel.split("、")
+    datasets: [
+        {
+            label: 'First Dataset',//模型名
+            data: [65, 59, 80, 81, 56, 55, 40],//置信度
+            fill: false,
+            backgroundColor: documentStyle.getPropertyValue('--p-primary-500'),
+            borderColor: documentStyle.getPropertyValue('--p-primary-500'),
+            tension: 0.4
+        },
+        {
+            label: 'Second Dataset',
+            data: [65, 59, 80, 81, 56, 55, 40],
+            fill: false,
+            backgroundColor: documentStyle.getPropertyValue('--p-primary-500'),
+            borderColor: documentStyle.getPropertyValue('--p-primary-500'),
+            tension: 0.4
+        }
+    ]
+};
+lineOptions.value = {
+    plugins: {
+        legend: {
+            labels: {
+                fontColor: textColor
+            }
+        }
+    },
+    scales: {
+        x: {
+            title: {
+                display: true,
+                text: '迭代次数', // 横坐标表示
+                color: textColorSecondary
+            },
+            ticks: {
+                color: textColorSecondary
+            },
+            grid: {
+                color: surfaceBorder,
+                drawBorder: false
+            }
+        },
+        y: {
+            title: {
+                display: true,
+                text: '对抗置信度', // 横坐标表示
+                color: textColorSecondary
+            },
+            ticks: {
+                color: textColorSecondary
+            },
+            grid: {
+                color: surfaceBorder,
+                drawBorder: false
+            }
+        }
+    }
+};
+
+
+onMounted(() => {
+    fetchData()
+});
+
+
+function fetchData() {
+    store.dispatch('task/getTasks').then(data => {
+        let taskId_ = parseInt(taskId, 10);
+        const targetModels = data[taskId_].targetmodel.split('、');
+        const iterations = parseInt(data[taskId_].iteration, 10);
+        const uidata = getuiData(data[taskId_].directory + "/uidata.json")
+        value.value = Math.ceil(uidata.current_iteration / uidata.all_iteration)
+        // 创建 labels
+        lineData.value.labels = Array.from({ length: iterations }, (v, k) => k + 1);
+
+        // 创建 datasets
+        lineData.value.datasets = targetModels.map((model, index) => ({
+            label: model,
+            data: uidata.confidence[model],
+            fill: false,
+            backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
+            borderColor: `hsl(${index * 60}, 70%, 50%)`,
+            tension: 0.4
+        }));
+    }).catch(error => {
+        console.error('Error fetching tasks:', error);
+    });
+}
+
+function getuiData(path) {
+    const { ipcRenderer } = require('electron')
+    const uidata = ipcRenderer.invoke('read-ui-json-file', path)
+    if (uidata) {
+        console.log(uidata)
+        return uidata
+    }else{
+      console.log("读取ui数据失败")  
+    }
+}
+
+
 </script>
 
 <template>
-    
+
     <div class="card">
-        <h2>攻击过程详情 - 任务 ID: {{ taskId }}</h2>
-        <DataTable :value="samples" tableStyle="min-width: 50rem">
-            <Column header="序号" field="id"></Column>
-            <Column header="迭代次数" field="directory"></Column>
-            <Column header="产生时间" field="compilefile"></Column>
-            <Column header="对抗置信度" field="compileflags"></Column>
-            <Column header="控制流变化文件" field="targetmodel"></Column>
-            
-            <!-- 查看攻击过程 -->
-            <Column header="下载" class="w-24 !text-end">
-                <template #body="{ data }">
-                    <Button icon="pi pi-search" @click="viewAttackProcess(data.id)" severity="secondary" rounded>
-                    </Button>
-                </template>
-            </Column>
-
-            <!-- 查看攻击样本 -->
-            <Column header="删除" class="w-24 !text-end">
-                <template #body="{ data }">
-                    <Button icon="pi pi-search" @click="viewAttackSample(data.id)" severity="secondary" rounded>
-                    </Button>
-                </template>
-            </Column>
-
-        </DataTable>
+        <div class="font-semibold text-xl mb-4">完成进度</div>
+        <div class="flex flex-col md:flex-row mb-4">
+            <div class="w-full">
+                <ProgressBar :value="value"></ProgressBar>
+            </div>
+        </div>
+        <div class="col-span-12 xl:col-span-6">
+            <div class="font-semibold text-xl mb-4">对抗置信度变化</div>
+            <Chart type="line" :data="lineData" :options="lineOptions"></Chart>
+        </div>
     </div>
 </template>
-

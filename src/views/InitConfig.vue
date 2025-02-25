@@ -95,6 +95,7 @@ const createTaskData = (formData) => {
     timestamp:  formatTimestamp(new Date()),  // 生成时间戳
     targetmodel: formData.attackModel.join('、'),
     iteration: formData.iterationCount,
+    schedule: '0',
     controlflow: controlflowstr
   };
 };

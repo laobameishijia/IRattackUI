@@ -15,6 +15,7 @@
     "primeicons": "^7.0.0",
     "primevue": "^4.2.4",
     "vue": "^3.4.34",
+    "vue-cli-plugin-electron-builder": "^2.1.1",
     "vue-router": "^4.4.0",
     "vuex": "^4.1.0"
   },
