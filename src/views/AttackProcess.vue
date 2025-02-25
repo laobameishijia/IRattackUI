@@ -7,20 +7,17 @@ const store = useStore();
 
 const route = useRoute();
 const taskId = route.params.id;  // 获取任务 ID
-const tasksdata = ref('');
 
 const lineData = ref('');
 const lineOptions = ref('');
-let length_ = 0;
 
 const documentStyle = getComputedStyle(document.documentElement);
 const textColor = documentStyle.getPropertyValue('--text-color');
 const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
 const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-
 const value = ref(0);
-let interval = null;
+
 lineData.value = {
     labels: '',
     // data[0].targetmodel.split("、")
@@ -84,46 +81,25 @@ lineOptions.value = {
 };
 
 
-store.dispatch('task/getTasks').then(data => {
-    tasksdata.value = data
-    length_ = parseInt(tasksdata.value[0].iteration, 10)
-    console.log(length_); // length是30
-    startProgress();
-    lineData.value.labels = Array.from({ length:  length_}, (v, k) => k + 1)
-}).catch(error => {
-    console.error('Error fetching tasks:', error);
-});
-
-console.log(lineData.value);
-
 onMounted(() => {
-
+    fetchData()
 });
-
-
-function startProgress() {
-    interval = setInterval(() => {
-        let newValue = value.value + Math.floor(Math.random() * 10) + 1;
-        if (newValue >= 100) {
-            newValue = 100;
-        }
-        value.value = newValue;
-    }, 2000);
-}
 
 
 function fetchData() {
     store.dispatch('task/getTasks').then(data => {
-        const targetModels = data[0].targetmodel.split('、');
-        const iterations = parseInt(data[0].iteration, 10);
-
+        let taskId_ = parseInt(taskId, 10);
+        const targetModels = data[taskId_].targetmodel.split('、');
+        const iterations = parseInt(data[taskId_].iteration, 10);
+        const uidata = getuiData(data[taskId_].directory + "/uidata.json")
+        value.value = Math.ceil(uidata.current_iteration / uidata.all_iteration)
         // 创建 labels
         lineData.value.labels = Array.from({ length: iterations }, (v, k) => k + 1);
 
         // 创建 datasets
         lineData.value.datasets = targetModels.map((model, index) => ({
             label: model,
-            data: Array.from({ length: iterations }, () => Math.floor(Math.random() * 100)), // 假数据，替换为真实数据
+            data: uidata.confidence[model],
             fill: false,
             backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
             borderColor: `hsl(${index * 60}, 70%, 50%)`,
@@ -133,6 +109,19 @@ function fetchData() {
         console.error('Error fetching tasks:', error);
     });
 }
+
+function getuiData(path) {
+    const { ipcRenderer } = require('electron')
+    const uidata = ipcRenderer.invoke('read-ui-json-file', path)
+    if (uidata) {
+        console.log(uidata)
+        return uidata
+    }else{
+      console.log("读取ui数据失败")  
+    }
+}
+
+
 </script>
 
 <template>

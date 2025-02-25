@@ -90,3 +90,22 @@ ipcMain.handle('read-text-file', (event, filePath) => {
       });
   });
 });
+
+ipcMain.handle('read-ui-json-file', (event, filePath) => {
+  return new Promise((resolve, reject) => {
+      readFile(filePath, 'utf8', (err, data) => {
+          if (err) {
+              console.error('读取文件时出错:', err);
+              reject(err);
+          } else {
+              try {
+                  const jsonData = JSON.parse(data);
+                  resolve(jsonData);
+              } catch (parseError) {
+                  console.error('解析 JSON 时出错:', parseError);
+                  reject(parseError);
+              }
+          }
+      });
+  });
+});
