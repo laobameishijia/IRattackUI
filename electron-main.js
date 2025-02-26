@@ -1,11 +1,11 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const { readdirSync, statSync, readFile } = require('fs');
-const { join, path } = require('path');
+const { join, basename } = require('path');
 let mainWindow
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
+    width: 1400,
     height: 600,
     webPreferences: {
       nodeIntegration: true,
@@ -54,8 +54,9 @@ ipcMain.handle('select-file', async () => {
 })
 
 // 监听来自渲染进程的获取文件列表请求
+ipcMain.handle('get-files-in-directory', async (event, directoryPath) => {
+  let idCounter = 1; // ID 计数器在外部定义
 
-ipcMain.handle('get-files-in-directory', (event, directoryPath) => {
   const getAllFiles = (dirPath) => {
     let files = [];
     const entries = readdirSync(dirPath, { withFileTypes: true });
@@ -63,19 +64,19 @@ ipcMain.handle('get-files-in-directory', (event, directoryPath) => {
       const filePath = join(dirPath, entry.name);
       if (entry.isDirectory()) {
         files = files.concat(getAllFiles(filePath));
-      } else if (filePath.endsWith('.txt')) { // 只处理 .txt 文件
+      } else if (filePath.endsWith('.txt') && !(entry.name.startsWith('success_') || entry.name.startsWith('failed_'))) { // 只处理 .txt 文件
         const stats = statSync(filePath);
         const fileName = entry.name;
-        const [iteration, confidence] = fileName.split('_').map((part, index) => {
+        const [iteration, advconfidence] = fileName.split('_').map((part, index) => {
           return index === 0 ? parseInt(part, 10) : parseFloat(part.replace('.txt', ''));
         });
         files.push({
-          id: files.length + 1,
+          id: idCounter++, // 使用 ID 计数器，并递增
           path: filePath,
-          timestamp: stats.birthtime,
+          timestamp: formatTimestamp(stats.birthtime),
           iteration,
           advconfidence,
-          targetmodel: basename(directoryPath)
+          targetmodel: basename(dirPath)
         });
       }
     });
@@ -83,14 +84,29 @@ ipcMain.handle('get-files-in-directory', (event, directoryPath) => {
   };
 
   try {
-    console.log(directoryPath);
-    return getAllFiles(directoryPath);
+    console.log('Directory Path:', directoryPath);
+    const result = await getAllFiles(directoryPath);
+    console.log('Files:', result);
+    return result;
   } catch (error) {
     console.error('获取文件列表时出错:', error);
     return [];
   }
 });
 
+
+function formatTimestamp(date) {
+  const pad = (num) => String(num).padStart(2, '0');
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1); // 月份从0开始
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  const seconds = pad(date.getSeconds());
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
 
 ipcMain.handle('read-text-file', (event, filePath) => {
   return new Promise((resolve, reject) => {

@@ -87,19 +87,18 @@ onMounted(() => {
 
 
 function fetchData() {
-    store.dispatch('task/getTasks').then(data => {
-        let taskId_ = parseInt(taskId, 10);
-        const targetModels = data[taskId_].targetmodel.split('、');
-        const iterations = parseInt(data[taskId_].iteration, 10);
-        const uidata = getuiData(data[taskId_].directory + "/uidata.json")
-        value.value = Math.ceil(uidata.current_iteration / uidata.all_iteration)
+    store.dispatch('task/getTasks').then(async data => {
+        let taskId_ = parseInt(taskId, 10) - 1;
+        const targetModels = data[taskId_].targetmodel.split('、')
+        const iterations = parseInt(data[taskId_].iteration, 10)
+        const uidata = await getuiData(data[taskId_].directory + "/uidata.json")
+        value.value = Math.round((uidata.current_iteration / uidata.all_iteration) * 100 * 10) / 10
         // 创建 labels
         lineData.value.labels = Array.from({ length: iterations }, (v, k) => k + 1);
-
         // 创建 datasets
         lineData.value.datasets = targetModels.map((model, index) => ({
             label: model,
-            data: uidata.confidence[model],
+            data: Array.isArray(uidata.confidence[model]) ? uidata.confidence[model] : [uidata.confidence[model]],
             fill: false,
             backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
             borderColor: `hsl(${index * 60}, 70%, 50%)`,
@@ -114,7 +113,6 @@ function getuiData(path) {
     const { ipcRenderer } = require('electron')
     const uidata = ipcRenderer.invoke('read-ui-json-file', path)
     if (uidata) {
-        console.log(uidata)
         return uidata
     }else{
       console.log("读取ui数据失败")  
