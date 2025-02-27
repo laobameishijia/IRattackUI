@@ -114,8 +114,8 @@ function getuiData(path) {
     const uidata = ipcRenderer.invoke('read-ui-json-file', path)
     if (uidata) {
         return uidata
-    }else{
-      console.log("读取ui数据失败")  
+    } else {
+        console.log("读取ui数据失败")
     }
 }
 
@@ -123,8 +123,8 @@ function getuiData(path) {
 </script>
 
 <template>
-
     <div class="card">
+        <h2 class="title">攻击过程详情 - 任务 ID: {{ taskId }}</h2>
         <div class="font-semibold text-xl mb-4">完成进度</div>
         <div class="flex flex-col md:flex-row mb-4">
             <div class="w-full">
@@ -137,3 +137,12 @@ function getuiData(path) {
         </div>
     </div>
 </template>
+
+
+<style scoped>
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+</style>

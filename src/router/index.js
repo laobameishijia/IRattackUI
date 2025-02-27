@@ -1,5 +1,4 @@
 import InitConfig from '@/views/InitConfig.vue';
-import APP from '@/App.vue'
 import Tasks from '@/views/Tasks.vue';
 import AttackProcess from '@/views/AttackProcess.vue';
 import AttackSample from '@/views/AttackSample.vue';
@@ -11,7 +10,7 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            component: APP,
+            component: InitConfig,
         },
         {
             path: '/initconfig',
