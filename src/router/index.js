@@ -2,6 +2,7 @@ import InitConfig from '@/views/InitConfig.vue';
 import Tasks from '@/views/Tasks.vue';
 import AttackProcess from '@/views/AttackProcess.vue';
 import AttackSample from '@/views/AttackSample.vue';
+import ControlFlowGraph from  '@/views/ControlFlowGraph.vue'
 
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -19,6 +20,10 @@ const router = createRouter({
         {
             path: '/tasks', 
             component: Tasks
+        },
+        { 
+            path: '/controlflowgraph', 
+            component: ControlFlowGraph 
         },
         { 
             path: '/attack-sample/:id', 

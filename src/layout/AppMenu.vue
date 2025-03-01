@@ -9,6 +9,8 @@ const model = ref([
         items: [
             { label: '初始配置', icon: 'pi pi-fw pi-bars', to: '/initconfig' },
             { label: '任务详情', icon: 'pi pi-fw pi-bars', to: '/tasks' },
+            { label: '控制流图', icon: 'pi pi-fw pi-bars', to: '/controlflowgraph' },
+
         ]
     }
 ]);

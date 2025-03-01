@@ -7,6 +7,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 600,
+    title: 'IRFuzz恶意ELF程序GNN检测模型对抗攻击系统',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
@@ -17,8 +18,8 @@ function createWindow() {
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL('http://localhost:5173')
   } else {
-    mainWindow.loadURL('http://localhost:5173')
-    // mainWindow.loadFile(path.join(__dirname, 'index.html'))
+    // mainWindow.loadURL('http://localhost:5173')
+    mainWindow.loadFile(join(__dirname,'dist', 'index.html'))
   }
 
   mainWindow.on('closed', function () {
