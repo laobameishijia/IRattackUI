@@ -19,7 +19,7 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:5173')
   } else {
     // mainWindow.loadURL('http://localhost:5173')
-    mainWindow.loadFile(join(__dirname,'dist', 'index.html'))
+    mainWindow.loadFile(join(__dirname, 'dist', 'index.html'))
   }
 
   mainWindow.on('closed', function () {
@@ -139,4 +139,15 @@ ipcMain.handle('read-ui-json-file', (event, filePath) => {
       }
     });
   });
+});
+
+
+ipcMain.handle('get-images', async (event, dirPath) => {
+  const files = fs.readdirSync(dirPath);
+  const functions = files.filter(file => /\.dot$/.test(file)).reduce((acc, file) => {
+    const functionName = path.basename(file, '.dot');
+    acc[functionName] = path.join(dirPath, `${functionName}.dot.png`);
+    return acc;
+  }, {});
+  return functions;
 });
