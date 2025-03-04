@@ -85,6 +85,28 @@ onMounted(() => {
     fetchData()
 });
 
+function calculate_value(uidata) {
+
+    // 计算第一个值
+    const value1 = Math.round((uidata.current_iteration / uidata.all_iteration) * 100 * 10) / 10
+
+    // 计算第二个值
+    let modelCount30 = 0;
+    let modelCountOver0_5 = 0;
+
+    for (const key in uidata.confidence) {
+        if (uidata.confidence[key].length === 30) {
+            modelCount30++;
+        }
+        if (uidata.confidence[key].some(conf => conf > 0.5)) {
+            modelCountOver0_5++;
+        }
+    }
+    const value2 = Math.round(((modelCount30 + modelCountOver0_5) / 6) * 100 * 10) / 10;
+
+    // 取两个值中的最大值
+    return Math.max(value1, value2);
+}
 
 function fetchData() {
     store.dispatch('task/getTasks').then(async data => {
@@ -92,7 +114,7 @@ function fetchData() {
         const targetModels = data[taskId_].targetmodel.split('、')
         const iterations = parseInt(data[taskId_].iteration, 10)
         const uidata = await getuiData(data[taskId_].directory + "/uidata.json")
-        value.value = Math.round((uidata.current_iteration / uidata.all_iteration) * 100 * 10) / 10
+        value.value = calculate_value(uidata)
         // 创建 labels
         lineData.value.labels = Array.from({ length: iterations }, (v, k) => k + 1);
         // 创建 datasets

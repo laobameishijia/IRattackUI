@@ -10,7 +10,8 @@ function createWindow() {
     title: 'IRFuzz恶意ELF程序GNN检测模型对抗攻击系统',
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false
+      contextIsolation: false,
+      webSecurity: false
     }
   })
 
@@ -143,10 +144,11 @@ ipcMain.handle('read-ui-json-file', (event, filePath) => {
 
 
 ipcMain.handle('get-images', async (event, dirPath) => {
-  const files = fs.readdirSync(dirPath);
+  const files = readdirSync(dirPath);
   const functions = files.filter(file => /\.dot$/.test(file)).reduce((acc, file) => {
-    const functionName = path.basename(file, '.dot');
-    acc[functionName] = path.join(dirPath, `${functionName}.dot.png`);
+    const fileName = basename(file, '.dot')
+    const functionName = fileName.slice(1);
+    acc[functionName] = join(dirPath, `${fileName}.dot.png`);
     return acc;
   }, {});
   return functions;

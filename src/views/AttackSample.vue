@@ -67,20 +67,27 @@ const closeDialog = () => {
         <h2 class="title">攻击过程详情 - 任务 ID: {{ taskId }}</h2>
         <h3 class="table-title">攻击样本表格</h3>
         <DataTable :value="samples" paginator :rows="10">
-            <Column header="序号" field="id" style="width: 10%"></Column>
-            <Column header="迭代次数" field="iteration" style="width: 15%"></Column>
+            <Column header="序号" field="id" style="width: 6%"></Column>
+            <Column header="迭代次数" field="iteration" style="width: 10%"></Column>
             <Column header="目标模型" field="targetmodel" style="width: 15%"></Column>
             <Column header="对抗置信度" field="advconfidence" style="width: 15%"></Column>
-            <Column header="产生时间" field="timestamp" style="width: 20%"></Column>
+            <Column header="产生时间" field="timestamp" style="width: 15%"></Column>
 
-            <Column header="控制流变化文件预览" class="w-24 !text-end" style="width: 16%">
+            <Column header="控制流变化种子文件预览" class="w-24 !text-end" style="width: 12%">
                 <template #body="{ data }">
                     <Button icon="pi pi-search" @click="openDialog(data.path)" severity="secondary" rounded>
                     </Button>
                 </template>
             </Column>
 
-            <Column header="下载" class="w-24 !text-end" style="width: 5%">
+            <Column header="中间语言控制流图" class="w-24 !text-end" style="width: 10%">
+                <template #body="{ data }">
+                    <Button icon="pi pi-search" @click="openDialog(data.path)" severity="secondary" rounded>
+                    </Button>
+                </template>
+            </Column>
+
+            <Column header="下载" class="w-24 !text-end" style="width: 3%">
                 <template #body="{ data }">
                     <Button icon="pi pi-download" @click="" severity="secondary" rounded>
                     </Button>
@@ -88,14 +95,16 @@ const closeDialog = () => {
             </Column>
 
             <!-- 查看攻击样本 -->
-            <Column header="删除" class="w-24 !text-end" style="width: 5%">
+            <Column header="删除" class="w-24 !text-end" style="width: 3%">
                 <template #body="{ data }">
                     <Button icon="pi pi-trash" @click="" severity="secondary" rounded>
                     </Button>
                 </template>
             </Column>
+
+
             <!-- 弹窗部分 -->
-            <Dialog header="Dialog" v-model:visible="display" :breakpoints="{ '960px': '75vw' }" :style="{ width: '60vw' }"
+            <Dialog header="控制流变化种子文件" v-model:visible="display" :breakpoints="{ '960px': '75vw' }" :style="{ width: '60vw' }"
                 :modal="true">
                 <p class="dialog-content">
                     {{ dialogContent }}
