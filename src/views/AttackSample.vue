@@ -10,6 +10,7 @@ const samples = ref();
 const display = ref(false);
 const dialogContent = ref('');
 let taskdata
+import AppBreadcrumb from '@/layout/AppBreadcrumb.vue';
 
 async function fetchData() {
     taskdata = await store.dispatch('task/getTasks')
@@ -60,9 +61,22 @@ const closeDialog = () => {
     display.value = false;
 }
 
+
+const home = {
+    icon: 'pi pi-home',
+    route: '/initconfig'
+};
+
+const items = [
+    { label: '任务详情', route: '/tasks' },
+    { label: '攻击样本展示' },
+
+];
+
 </script>
 
 <template>
+    <app-breadcrumb :home="home" :items="items"></app-breadcrumb>
     <div class="card">
         <h2 class="title">攻击过程详情 - 任务 ID: {{ taskId }}</h2>
         <h3 class="table-title">攻击样本表格</h3>

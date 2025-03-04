@@ -2,6 +2,7 @@
 import { ref} from 'vue'
 import { useRouter } from 'vue-router';  // 引入 useRouter
 import { useStore } from 'vuex';
+import AppBreadcrumb from '@/layout/AppBreadcrumb.vue';
 
 // 保存选中的目录路径
 const directoryPath = ref('')
@@ -110,11 +111,21 @@ const createNewTask = async (formData) => {
   }
 };
   
+const home = {
+  icon: 'pi pi-home',
+  route: '/initconfig'
+};
+
+const items = [
+  { label: '初始化配置', route: '/initconfig'},
+];
+
 </script>
 
 <template>
   <div class="flex flex-col md:flex-row gap-8">
     <div class="md:w-full">
+      <app-breadcrumb :home="home":items="items"></app-breadcrumb>
       <div class="card">
         <div class="font-semibold text-2xl mb-4">初始化配置</div>
         <div class="card flex justify-center">

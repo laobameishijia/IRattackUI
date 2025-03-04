@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted,computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';  // 引入 useRouter
 import { useStore } from 'vuex';
+import AppBreadcrumb from '@/layout/AppBreadcrumb.vue';
 
 const router = useRouter();  // 获取 router 实例
 const totalRecords = ref(0);
@@ -9,7 +10,7 @@ const store = useStore();
 const tasks = computed(() => store.getters['task/tasks']);
 
 onMounted(() => {
-    
+
 });
 
 // 跳转到查看攻击过程页面
@@ -22,9 +23,19 @@ const viewAttackSample = (taskId) => {
     router.push({ path: `/attack-sample/${taskId}` });
 };
 
+const home = {
+    icon: 'pi pi-home',
+    route: '/initconfig'
+};
+
+const items = [
+    { label: '任务详情', route: '/tasks' },
+];
+
 </script>
 
 <template>
+    <app-breadcrumb :home="home" :items="items"></app-breadcrumb>
     <div class="card">
         <DataTable :value=tasks paginator :rows="5">
             <Column header="任务编号" field="id" style="width: 5%"></Column>
@@ -38,7 +49,7 @@ const viewAttackSample = (taskId) => {
                     <Button :severity="data.schedule === '100' ? 'success' : 'info'">
                         {{ data.schedule === '100' ? '已完成' : '进行中' }}
                     </Button>
-                </template>    
+                </template>
             </Column>
 
             <!-- 查看攻击过程 -->

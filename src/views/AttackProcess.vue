@@ -3,6 +3,8 @@ import { useRoute } from 'vue-router';
 import { useLayout } from '@/layout/composables/layout';
 import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
+import AppBreadcrumb from '@/layout/AppBreadcrumb.vue';
+
 const store = useStore();
 
 const route = useRoute();
@@ -141,10 +143,21 @@ function getuiData(path) {
     }
 }
 
+const home = {
+    icon: 'pi pi-home',
+    route: '/initconfig'
+};
+
+const items = [
+    { label: '任务详情', route: '/tasks' },
+    { label: '攻击过程' },
+
+];
 
 </script>
 
 <template>
+    <app-breadcrumb :home="home" :items="items"></app-breadcrumb>
     <div class="card">
         <h2 class="title">攻击过程详情 - 任务 ID: {{ taskId }}</h2>
         <div class="font-semibold text-xl mb-4">完成进度</div>
