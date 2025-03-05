@@ -1,16 +1,19 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter} from 'vue-router';
 import { useStore } from 'vuex';
-const { join, basename } = require('path');
+import AppBreadcrumb from '@/layout/AppBreadcrumb.vue';
+
+const { join, dirname } = require('path');
 const store = useStore();
 const route = useRoute();
+const router = useRouter();  // 获取 router 实例
+
 const taskId = route.params.id;  // 获取任务 ID
 const samples = ref();
 const display = ref(false);
 const dialogContent = ref('');
 let taskdata
-import AppBreadcrumb from '@/layout/AppBreadcrumb.vue';
 
 async function fetchData() {
     taskdata = await store.dispatch('task/getTasks')
@@ -61,6 +64,11 @@ const closeDialog = () => {
     display.value = false;
 }
 
+function viewcontrolflowgraph(path){
+    const imagePath = join(path, "images");
+    console.log(imagePath)
+    router.push({ name: 'controlflowgraph', query: { imagePath } });
+}
 
 const home = {
     icon: 'pi pi-home',
@@ -96,7 +104,7 @@ const items = [
 
             <Column header="中间语言控制流图" class="w-24 !text-end" style="width: 10%">
                 <template #body="{ data }">
-                    <Button icon="pi pi-search" @click="openDialog(data.path)" severity="secondary" rounded>
+                    <Button icon="pi pi-search" @click="viewcontrolflowgraph(dirname(data.path))" severity="secondary" rounded>
                     </Button>
                 </template>
             </Column>

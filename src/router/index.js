@@ -22,8 +22,9 @@ const router = createRouter({
             component: Tasks
         },
         { 
+            name: 'controlflowgraph',
             path: '/controlflowgraph', 
-            component: ControlFlowGraph 
+            component: ControlFlowGraph,
         },
         { 
             path: '/attack-sample/:id', 

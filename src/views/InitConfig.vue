@@ -125,7 +125,7 @@ const items = [
 <template>
   <div class="flex flex-col md:flex-row gap-8">
     <div class="md:w-full">
-      <app-breadcrumb :home="home":items="items"></app-breadcrumb>
+      <app-breadcrumb :home="home" :items="items"></app-breadcrumb>
       <div class="card">
         <div class="font-semibold text-2xl mb-4">初始化配置</div>
         <div class="card flex justify-center">
