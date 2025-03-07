@@ -39,6 +39,7 @@ onMounted(async () => {
     samples.value.forEach((item, index) => {
         item.id = index + 1;
     });
+    console.log(samples)
 });
 
 const readFileList = async (directoryPath) => {
@@ -88,7 +89,7 @@ const items = [
     <div class="card">
         <h2 class="title">攻击过程详情 - 任务 ID: {{ taskId }}</h2>
         <h3 class="table-title">攻击样本表格</h3>
-        <DataTable :value="samples" paginator :rows="10">
+        <DataTable :value="samples" paginator :rows="6">
             <Column header="序号" field="id" style="width: 6%"></Column>
             <Column header="迭代次数" field="iteration" style="width: 10%"></Column>
             <Column header="目标模型" field="targetmodel" style="width: 15%"></Column>

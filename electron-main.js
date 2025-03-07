@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
-const { readdirSync, statSync, readFile } = require('fs');
-const { join, basename } = require('path');
+const { readdirSync, statSync, readFile,readFileSync} = require('fs');
+const { join, basename, dirname } = require('path');
+const grpcClient = require('./src/service/grpc_client.js');
 let mainWindow
 
 function createWindow() {
@@ -78,7 +79,7 @@ ipcMain.handle('get-files-in-directory', async (event, directoryPath) => {
           timestamp: formatTimestamp(stats.birthtime),
           iteration,
           advconfidence,
-          targetmodel: basename(dirPath)
+          targetmodel: basename(dirname(dirPath))
         });
       }
     });
@@ -152,4 +153,13 @@ ipcMain.handle('get-images', async (event, dirPath) => {
     return acc;
   }, {});
   return functions;
+});
+
+
+ipcMain.handle('detect-file', async (event, filePath) => {
+  console.log("Test")
+  const content = readFileSync(filePath);
+  const base64Content = content.toString('base64');
+  console.log("base64Content",base64Content)
+  return await grpcClient.detect(content);
 });

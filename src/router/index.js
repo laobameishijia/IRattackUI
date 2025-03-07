@@ -3,7 +3,7 @@ import Tasks from '@/views/Tasks.vue';
 import AttackProcess from '@/views/AttackProcess.vue';
 import AttackSample from '@/views/AttackSample.vue';
 import ControlFlowGraph from  '@/views/ControlFlowGraph.vue'
-
+import Grpc from '@/views/Grpc.vue'
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -33,6 +33,10 @@ const router = createRouter({
         { 
             path: '/attack-process/:id', 
             component: AttackProcess 
+        },
+        { 
+            path: '/grpc', 
+            component: Grpc 
         }
     ]
 });

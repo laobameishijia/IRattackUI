@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package model;
+
+service ModelService {
+  rpc Detect (ModelRequest) returns (ModelResponse);
+}
+
+message ModelRequest {
+  bytes content = 1;
+}
+
+message ModelResponse {
+  map<string, double> probabilities = 1;
+}
